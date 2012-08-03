@@ -15,12 +15,24 @@ class SuperAI
       move << win(indeces, player, board)
       move.compact!
     end
-    if board.count(0) == 6 && across?(board, opponent)
-      move << [1,3,5,7].sample
-    elsif board[4] == 0
-      move << 4
-    elsif board[4] != 0
+    if board.count(0) == 8 && board[4] == opponent
       move << [0,2,6,8].sample
+    elsif board.count(0) == 8 && board[4] == 0
+      move << 4
+    end
+    indexlist.each do |indeces|
+      puts "this is opponent split check"
+      puts opponent_advance(indeces, opponent, board)
+      if opponent_advance(indeces, opponent, board) != nil && across(board, opponent) == false
+        move << opponent_advance(indeces, opponent, board)
+      elsif board.count(0) == 6 && across?(board, opponent)
+        move << [1,3,5,7].sample
+      elsif board.count(0) == 6 && board[4] == player
+        puts "making advance"
+        move << advance(indeces, player, board)
+      end
+      puts "this is move"
+      puts move
     end
     if move.size == 0
       indexlist.each do |indeces|
@@ -37,7 +49,20 @@ class SuperAI
         move << AI.new.make_move(board, 2, player) - 1
       end
     end
-    move.flatten.sample
+    puts "this is move before flatten"
+    puts move
+    puts "after"
+    puts move.flatten.sample
+    return move.flatten.sample
+    
+  end
+  
+  def opponent_advance(indeces, opponent, board)
+    opponentadvance = []
+    opponentadvance << advance(indeces, opponent, board)
+    if opponentadvance.group_by {|n| n}.max_by {|k,v| v.size}.last.size > 1
+      opponentadvance.group_by {|n| n}.max_by {|k,v| v.size}.first
+    end
   end
   
   def across?(board, opponent)

@@ -1,4 +1,3 @@
-require_relative 'unbeatable'
 class AI
   
   def choose_mark
@@ -19,11 +18,7 @@ class AI
   
   def make_move(board, playertype, playernumber)
     move = 0
-    if playertype != 3
       move = get_available_indexes(board).sample
-    else
-      move = SuperAI.new.main(board, playernumber)
-    end
     move += 1
     move
   end

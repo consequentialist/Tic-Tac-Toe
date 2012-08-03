@@ -6,14 +6,14 @@ require_relative 'ai'
 
 class Motherclass
   
-  def initialize
-    jeffry = 0
+  def start
+    @board = Board.new
+    @ui = UserInterface.new
+    @ai = AI.new
   end
   
   def user_interface
-    board = Board.new
-    ui = UserInterface.new
-    ai = AI.new #here boy
+     #here boy
     ui.gamestart_message
     p1 = ui.game_play1(board)
     p2 = 0
@@ -37,51 +37,46 @@ class Motherclass
     end
   end
   
-  def calculate_illegal(playermove, board, player, ui)
-    move = 0
-    move = playermove
-      while illegal?(move) || is_cheater?(move)
-        if illegal?(move)
-          puts "INVALID INPUT! Try Again:"
-          if player == 1
-            move = ui.game_play1(board)
-          else
-            move = ui.game_play2(board)
-          end
-        else
-          puts "You are a cheater! You should be slapped."
-          puts "Try Again:"
-          if player == 1
-            move = ui.game_play1(board)
-          else
-            move = ui.game_play2(board)
-          end
-        end
-      end
-      move
-  end
+  #def calculate_illegal(playermove, board, player, chosenmove)
+   # move = 0
+    #move = playermove
+     # while illegal?(move) || cheater?(move)
+      #  if illegal?(move)
+       #   puts "INVALID INPUT! Try Again:"
+        #  if player == 1
+         #   move = ui.game_play1(board)
+          #else
+          #  move = ui.game_play2(board)
+          #end
+        #else
+         # puts "You are a cheater! You should be slapped."
+          #puts "Try Again:"
+          #if player == 1
+           # move = ui.game_play1(board)
+          #else
+           # move = ui.game_play2(board)
+          #end
+        #end
+      #end
+      #move
+  #end
  
   def illegal?(spot)
     spot > 9 || spot < 1
   end
   
-  def is_cheater?(spot)
-    @boardarray[spot - 1] != 0 #&& @boardarray.count(0) !=9
+  def cheater?(board, spot)
+    board[spot - 1] > 0 #&& @boardarray.count(0) !=9
   end
   
   def board_setter(spot, player, board)
     @boardarray = []
-    @boardarray += board.set_value(spot, player) 
-    if Winner.new.determine_win(@boardarray) == 0 
+    @boardarray += board.set_value(spot, player)
       return @boardarray
-    else 
-      return Winner.new.determine_win(@boardarray)
-    end
   end
   
   def end_game?(input)
-    currentboard = input
-    [1, 2, 3].include?(currentboard) 
+    EndResult.new.determine_win(input) != 0
   end
 
 end

@@ -128,50 +128,8 @@ class UserInterface
     sleep($delay)
   end
   
-  def choose_player
-    @p1type = 0
-    @p2type = 0
-    puts "Choose Player 1 Type:"
-    puts "(H) Human"
-    puts "(C) Computer"
-    choice = gets.chomp
-    @p1type = determine_choice(choice)
-    sleep($delay)
-    puts "Choose Player 2 Type:"
-    puts "(H) Human"
-    puts "(C) Computer"
-    choice = gets.chomp
-    @p2type = determine_choice(choice)
-    sleep($delay)
-    puts "Your Choices:"
-    sleep($delay)
-    if @p1type == 1
-      puts "Player 1 = Human"
-    else
-      puts "Player 1 = Computer"
-      sleep($delay)
-      puts "Choose Computer Type:"
-      puts "(1) Dumb Computer"
-      puts "(2) Smart Computer"
-      @p1type = gets.to_i + 1
-      if @p1type == 3 && $delay !=0
-        puts "Hi, My name is Doug.\n Before we begin, I want to warn you that I am the greatest AI tic-tac-toe player in the world,\n and you will never defeat me. Good luck."
-      end
-    end
-    sleep($delay)
-    if @p2type == 1
-      puts "Player 2 = Human"
-    else
-      puts "Player 2 = Computer"
-      sleep($delay)
-      puts "Choose Computer Type:"
-      puts "(1) Dumb Computer"
-      puts "(2) Smart Computer"
-      @p2type = gets.to_i + 1
-      if @p2type == 3 && $delay !=0
-        puts "Hi, My name is Doug.\n Before we begin, I want to warn you that I am the greatest AI tic-tac-toe player in the world,\n and you will never defeat me. Good luck."
-      end
-    end
+  def choose_players
+    
   end
   
   def determine_choice(choice)
