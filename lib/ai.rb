@@ -16,11 +16,8 @@ class AI
     available
   end
   
-  def make_move(board, playertype, playernumber)
-    move = 0
-      move = get_available_indexes(board).sample
-    move += 1
-    move
+  def make_move(board, player)
+     get_available_indexes(board).sample + 1
   end
   
 end
