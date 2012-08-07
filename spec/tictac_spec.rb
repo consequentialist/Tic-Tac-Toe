@@ -5,8 +5,6 @@ require "board"
 require "ui"
 require "unbeatable"
 
-interface = UserInterface.new
-
 describe "board" do
   
   before(:each) do
@@ -68,11 +66,6 @@ describe "graphics" do
 #_7_|_8_|_9_"
  # end
   
-  it "can notify user of game end" do
-    interface.announce_end(1).should == "Player 1 wins!"
-    interface.announce_end(2).should == "Player 2 wins!"
-    interface.announce_end(3).should == "It's a tie!"
-  end
   
 end
 
@@ -155,13 +148,56 @@ describe "AI" do
   end
   
   it "can make a random move" do
-    @ai.make_move([1,0,0,2,0,2,1,0,0],2,2).should_not == 1 || 4 || 6 || 7
+    @ai.make_move([1,0,0,2,0,2,1,0,0],2).should_not == 1 || 4 || 6 || 7
   end
   
   it "can choose a mark" do
     @ai.choose_mark.should satisfy {|mark| ["A", "B"].include?(mark)}
   end
   
+end
+
+describe "ui" do 
+  
+  before(:each) do
+    @ui = UserInterface.new
+  end
+  
+  it "can notify user of game end" do
+    @ui.announce_end(1).should == "Player 1 wins!"
+    @ui.announce_end(2).should == "Player 2 wins!"
+    @ui.announce_end(3).should == "It's a tie!"
+  end
+  
+end
+
+describe "ui mock" do
+  
+  before(:each) do
+    @ui = mock(UserInterface)
+  end
+  
+  it "should display the gamestart message" do
+    @ui.stub!(:gamestart_message).and_return("Hit Enter to start")
+    @ui.should_receive(:gamestart_message).and_return("Hit Enter to start")
+    message = @ui.gamestart_message      
+    message.should match("Hit Enter to start")
+  end
+  
+  it "should display a new board" do
+    @ui.stub!(:new_board_graphics).with(1).and_return("   |   |   \n" + "_1_|_2_|_3_\n" + "   |   |   \n" + "_4_|_5_|_6_\n" + "   |   |   \n" + "_7_|_8_|_9_" )
+    @ui.should_receive(:new_board_graphics).with(1).and_return("   |   |   \n" + "_1_|_2_|_3_\n" + "   |   |   \n" + "_4_|_5_|_6_\n" + "   |   |   \n" + "_7_|_8_|_9_" )
+    board = @ui.new_board_graphics(1)
+    board.should match("   |   |   \n" + "_1_|_2_|_3_\n" + "   |   |   \n" + "_4_|_5_|_6_\n" + "   |   |   \n" + "_7_|_8_|_9_" )
+  end
+  
+  it "should populate a board" do 
+    @ui.stub!(:new_board_graphics).with(1).and_return("   |   |   \n" + "_1_|_2_|_3_\n" + "   |   |   \n" + "_4_|_5_|_6_\n" + "   |   |   \n" + "_7_|_8_|_9_" )
+    @ui.should_receive(:new_board_graphics).with(1).and_return("   |   |   \n" + "_1_|_2_|_3_\n" + "   |   |   \n" + "_4_|_5_|_6_\n" + "   |   |   \n" + "_7_|_8_|_9_" )
+    board = @ui.new_board_graphics(1)
+    board.should match(`)
+  end
+
 end
 
 describe "unbeatable ai" do
