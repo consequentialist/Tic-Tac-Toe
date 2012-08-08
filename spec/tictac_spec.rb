@@ -171,31 +171,28 @@ describe "ui" do
   
 end
 
-describe "ui mock" do
+describe "motherclass" do
   
   before(:each) do
-    @ui = mock(UserInterface)
+    @mother = Motherclass.new
   end
   
-  it "should display the gamestart message" do
-    @ui.stub!(:gamestart_message).and_return("Hit Enter to start")
-    @ui.should_receive(:gamestart_message).and_return("Hit Enter to start")
-    message = @ui.gamestart_message      
-    message.should match("Hit Enter to start")
-  end
-  
-  it "should display a new board" do
-    @ui.stub!(:new_board_graphics).with(1).and_return("   |   |   \n" + "_1_|_2_|_3_\n" + "   |   |   \n" + "_4_|_5_|_6_\n" + "   |   |   \n" + "_7_|_8_|_9_" )
-    @ui.should_receive(:new_board_graphics).with(1).and_return("   |   |   \n" + "_1_|_2_|_3_\n" + "   |   |   \n" + "_4_|_5_|_6_\n" + "   |   |   \n" + "_7_|_8_|_9_" )
-    board = @ui.new_board_graphics(1)
-    board.should match("   |   |   \n" + "_1_|_2_|_3_\n" + "   |   |   \n" + "_4_|_5_|_6_\n" + "   |   |   \n" + "_7_|_8_|_9_" )
-  end
-  
-  it "should populate a board" do 
-    @ui.stub!(:new_board_graphics).with(1).and_return("   |   |   \n" + "_1_|_2_|_3_\n" + "   |   |   \n" + "_4_|_5_|_6_\n" + "   |   |   \n" + "_7_|_8_|_9_" )
-    @ui.should_receive(:new_board_graphics).with(1).and_return("   |   |   \n" + "_1_|_2_|_3_\n" + "   |   |   \n" + "_4_|_5_|_6_\n" + "   |   |   \n" + "_7_|_8_|_9_" )
-    board = @ui.new_board_graphics(1)
-    board.should match(`)
+  it "should call the gamestart message" do
+    UserInterface.should_receive(:gamestart_message) { "Hit Enter to Start\n" }
+    UserInterface.should_receive(:choose_mark) { "Choose Your Mark:\n" }
+    UserInterface.should_receive(:invalid) { "Invalid input. Try again\n" }
+    UserInterface.should_receive(:choose_ui) {"Choose User Interface Type:\n" +
+                                              "(1) SD User Interface\n" +
+                                              "(2) HD User Interface" }
+    UserInterface.should_receive(:choose_player_type) { "Choose Player Type:\n" +
+                                                   "(1) Human\n" +
+                                                   "(2) Computer"}
+    UserInterface.should_receive(:splash) { "  _____ _        _____            _____           \n" +
+                                            " |_   _(_) ___  |_   _|_ _  ___  |_   _|__   ___  \n" +
+                                            "   | | | |/ __|   | |/ _` |/ __|   | |/ _ | / _ | \n" +
+                                            "   | | | | (__    | | (_| | (__    | | (_) |  __/ \n" +
+                                            "   |_| |_||___|   |_||__,_||___|   |_||___/ |___| \n"}
+    @mother.game_init
   end
 
 end
