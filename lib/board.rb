@@ -12,8 +12,8 @@ class Board
     @board
   end
   
-  def set_value(spot, player)
-    @board[spot_to_index(spot)] = player
+  def set_value(spot, playermark)
+    @board[spot_to_index(spot)] = playermark
     @board
   end
   

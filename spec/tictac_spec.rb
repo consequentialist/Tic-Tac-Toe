@@ -5,8 +5,6 @@ require "board"
 require "ui"
 require "unbeatable"
 
-interface = UserInterface.new
-
 describe "board" do
   
   before(:each) do
@@ -68,35 +66,32 @@ describe "graphics" do
 #_7_|_8_|_9_"
  # end
   
-  it "can notify user of game end" do
-    interface.announce_end(1).should == "Player 1 wins!"
-    interface.announce_end(2).should == "Player 2 wins!"
-    interface.announce_end(3).should == "It's a tie!"
-  end
   
 end
 
 describe "game logic" do
  
   before(:each) do
-    @winner = Winner.new
+    @end = EndResult.new
   end
  
   it "can determine a vertical win" do
-    @winner.is_vertical_win?([1,2,2,1,2,2,1,1,1]).should == 1
+    @end.is_vertical_win?([1,2,2,1,2,2,1,1,1]).should == 1
+    @end.is_vertical_win?([2,1,1,2,1,1,2,2,2]).should == 2
   end
   
   it "can determine a horizontal win" do 
-    @winner.is_horizontal_win?([2,2,2,1,1,2,1,2,1]).should == 2
+    @end.is_horizontal_win?([2,2,2,1,1,2,1,2,1]).should == 2
   end
   
   it "can determine a diagonal win" do
-    @winner.is_diagonal_win?([1,1,2,2,1,2,2,1,1]).should == 1
+    @end.is_diagonal_win?([1,1,2,2,1,2,2,1,1]).should == 1
+    @end.is_diagonal_win?([2,2,1,1,2,1,1,2,2]).should == 2
   end
   
   it "can determine the coutcome of any final board" do
-    @winner.determine_win([1,2,2,1,2,2,1,1,1]).should == 1
-    @winner.determine_win([2,2,1,1,1,2,2,1,1]).should == 3
+    @end.determine_win([1,2,2,1,2,2,1,1,1]).should == 1
+    @end.determine_win([2,2,1,1,1,2,2,1,1]).should == 3
   end
   
   
@@ -116,7 +111,7 @@ describe "mother" do
     @mother.board_setter(7,2,board).should == [1,2,2,0,0,0,2,0,0]
     @mother.board_setter(5,1,board).should == [1,2,2,0,1,0,2,0,0]
     @mother.board_setter(6,1,board).should == [1,2,2,0,1,1,2,0,0]
-    @mother.board_setter(9,1,board).should == 1
+    @mother.board_setter(9,1,board).should == [1, 2, 2, 0, 1, 1, 2, 0, 1] 
   end
   
   it "can tell if the game is over or not" do
@@ -136,8 +131,9 @@ describe "mother" do
     @mother.illegal?(3).should == false
   end
   
-  it "can calculate illegal" do
-    #@mother.calculate_illegal(15).should == 10
+  it "can determine cheating moves" do
+    @mother.cheater?([1,0,0,0,0,0,0,2,1], 8).should == true
+    @mother.cheater?([0,2,2,1,2,1,1,2,1], 1).should == false
   end
 end
 
@@ -152,9 +148,53 @@ describe "AI" do
   end
   
   it "can make a random move" do
-    @ai.make_move([1,0,0,2,0,2,1,0,0],2,2).should_not == 1 || 4 || 6 || 7
+    @ai.make_move([1,0,0,2,0,2,1,0,0],2).should_not == 1 || 4 || 6 || 7
   end
   
+  it "can choose a mark" do
+    @ai.choose_mark.should satisfy {|mark| ["A", "B"].include?(mark)}
+  end
+  
+end
+
+describe "ui" do 
+  
+  before(:each) do
+    @ui = UserInterface.new
+  end
+  
+  it "can notify user of game end" do
+    @ui.announce_end(1).should == "Player 1 wins!"
+    @ui.announce_end(2).should == "Player 2 wins!"
+    @ui.announce_end(3).should == "It's a tie!"
+  end
+  
+end
+
+describe "motherclass" do
+  
+  before(:each) do
+    @mother = Motherclass.new
+  end
+  
+  it "should call the gamestart message" do
+    UserInterface.should_receive(:gamestart_message) { "Hit Enter to Start\n" }
+    UserInterface.should_receive(:choose_mark) { "Choose Your Mark:\n" }
+    UserInterface.should_receive(:invalid) { "Invalid input. Try again\n" }
+    UserInterface.should_receive(:choose_ui) {"Choose User Interface Type:\n" +
+                                              "(1) SD User Interface\n" +
+                                              "(2) HD User Interface" }
+    UserInterface.should_receive(:choose_player_type) { "Choose Player Type:\n" +
+                                                   "(1) Human\n" +
+                                                   "(2) Computer"}
+    UserInterface.should_receive(:splash) { "  _____ _        _____            _____           \n" +
+                                            " |_   _(_) ___  |_   _|_ _  ___  |_   _|__   ___  \n" +
+                                            "   | | | |/ __|   | |/ _` |/ __|   | |/ _ | / _ | \n" +
+                                            "   | | | | (__    | | (_| | (__    | | (_) |  __/ \n" +
+                                            "   |_| |_||___|   |_||__,_||___|   |_||___/ |___| \n"}
+    @mother.game_init
+  end
+
 end
 
 describe "unbeatable ai" do
@@ -173,33 +213,33 @@ describe "unbeatable ai" do
    # @ai.block([2,0,2], 2).should == 1
   #end
   
-  it "can make a winning move based on a board" do
-    @ai.main([1,2,0,2,0,2,1,0,1], 1).should satisfy {|move| [7,4].include?(move)}
-  end
+ # it "can make a winning move based on a board" do
+  #  @ai.main([1,2,0,2,0,2,1,0,1], 1).should satisfy {|move| [7,4].include?(move)}
+  #end
   
-  it "can make a  winning move based on a board" do
-    @ai.main([1,2,0,2,0,2,1,1,0], 1).should == 8
-  end
+ # it "can make a  winning move based on a board" do
+  #  @ai.main([1,2,0,2,0,2,1,1,0], 1).should == 8
+  #end
   
-  it "can make a block based on a board" do
-    @ai.main([2,1,1,2,0,0,1,0,0], 2).should == 4
-  end
+  #it "can make a block based on a board" do
+   # @ai.main([2,1,1,2,0,0,1,0,0], 2).should == 4
+  #end
   
-  it "can make an advance based on a board" do
-    @ai.main([1,2,1,1,1,2,2,0,0], 2).should satisfy {|move| [7,8].include?(move)}
-  end
+ # it "can make an advance based on a board" do
+  #  @ai.main([1,2,1,1,1,2,2,0,0], 2).should satisfy {|move| [7,8].include?(move)}
+  #end
   
   #it "can make a correct first move" do
    # @ai.main([0,0,0,0,0,0,0,0,0], 1).should satisfy {|move| [0,2,6,8,4].include?(move)}
   #end
   
-  it "can make a correct second move" do
-    @ai.main([2,0,0,0,0,0,0,0,0], 1).should == 5
-  end
+  #it "can make a correct second move" do
+   # @ai.main([2,0,0,0,0,0,0,0,0], 1).should == 5
+ # end
   
-  it "can move correctly in a special scenario" do
-    @ai.main([1,0,0,0,2,0,0,0,1], 2).should satisfy {|move| [1,3,5,7].include?(move)}
-  end
+  #it "can move correctly in a special scenario" do
+    #@ai.main([1,0,0,0,2,0,0,0,1], 2).should satisfy {|move| [1,3,5,7].include?(move)}
+  #end
   
 end
 
