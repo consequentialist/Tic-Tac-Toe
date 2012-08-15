@@ -220,7 +220,7 @@ describe "move validator" do
   
   it "knows when a space is taken" do
     move = 2
-    board[move] = "not empty"
+    board[move-1] = "not empty"
     MoveValidator.validate(move, board).should == false
   end
   
@@ -284,13 +284,13 @@ describe "unbeatable ai" do
   
   it "can make the correct move" do
     board = [1,2,2,0,0,1,1,0,2]
-    @ai.make_move(board).should == 3
-    board = [2,0,0,0,0,0,0,0,0]
-    @ai.make_move(board).should == 4 
-    board = [1,0,2,0,0,0,0,0,0]
-    @ai.make_move(board).should == 3
-    board = [1,0,2,1,0,0,2,0,0]
     @ai.make_move(board).should == 4
+    board = [2,0,0,0,0,0,0,0,0]
+    @ai.make_move(board).should == 5 
+    board = [1,0,2,0,0,0,0,0,0]
+    @ai.make_move(board).should == 4
+    board = [1,0,2,1,0,0,2,0,0]
+    @ai.make_move(board).should == 5
   end
   
   #it "can determine a winning index" do

@@ -4,12 +4,6 @@ class EndResult
   PLAYER2 = 2
   TIE = 3
   
-  def sum(array, index1, index2, index3)
-    if array[index1] != 0 && array[index2] != 0 && array[index3] != 0
-    (array[index1] + array[index2] + array[index3])
-    end
-  end
-  
   def determine_win(finalboard)
     if is_vertical_win?(finalboard, PLAYER1) || is_horizontal_win?(finalboard, PLAYER1) || is_diagonal_win?(finalboard, PLAYER1)
       PLAYER1
