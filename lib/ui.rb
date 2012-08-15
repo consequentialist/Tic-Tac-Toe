@@ -35,13 +35,19 @@ class UserInterface
       else 
         letters << " "
       end
-      put "uiui"
     end
     if uistyle == REGULAR
-      return "   |   |   \n"+"_"+letters[0]+"_|_"+letters[1]+"_|_"+letters[2]+"_\n"+"   |   |   \n"+"_"+letters[3]+"_|_"+letters[4]+"_|_"+letters[5]+"_\n"+"   |   |   \n"+"_"+letters[6]+"_|_"+letters[7]+"_|_"+letters[8]+"_"
+      p "   |   |   \n"+"_"+letters[0]+"_|_"+letters[1]+"_|_"+letters[2]+"_\n"+"   |   |   \n"+"_"+letters[3]+"_|_"+letters[4]+"_|_"+letters[5]+"_\n"+"   |   |   \n"+"_"+letters[6]+"_|_"+letters[7]+"_|_"+letters[8]+"_"
     elsif uistyle == FANCY
-      return "1    |2    |3    \n"+"  "+letters[0]+"  |  "+letters[1]+"  |  "+letters[2]+"  \n"+"_____|_____|_____\n"+"4    |5    |6    \n"+"  "+letters[3]+"  |  "+letters[4]+"  |  "+letters[5]+"  \n"+"_____|_____|_____\n"+
-      "7    |8    |9    \n"+"  "+letters[6]+"  |  "+letters[7]+"  |  "+letters[8]+"  \n"+"     |     |     \n"
+      p "1    |2    |3    "
+      p"  "+letters[0]+"  |  "+letters[1]+"  |  "+letters[2]+"  "
+      p"_____|_____|_____"
+      p"4    |5    |6    "
+      p"  "+letters[3]+"  |  "+letters[4]+"  |  "+letters[5]+"  "
+      p"_____|_____|_____"
+      p"7    |8    |9    "
+      p"  "+letters[6]+"  |  "+letters[7]+"  |  "+letters[8]+"  "
+      p"     |     |     "
     end
   end 
   
@@ -76,7 +82,7 @@ class UserInterface
   
   def choose_mark
     puts "Choose Your Mark:"
-    gets.to_s
+    gets.chomp.to_s
   end
   
   def choose_player_type(player)

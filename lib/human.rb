@@ -1,8 +1,12 @@
 require_relative "ui"
 class Human
   
-def make_move(board, player)
-  UserInterface.new.make_move(player)
-end
+  def initialize(player=nil)
+    @player = player
+  end
+  
+  def make_move(board)
+    UserInterface.new.make_move(@player)
+  end
   
 end

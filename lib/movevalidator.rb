@@ -13,12 +13,12 @@ module MoveValidator
      board.each_with_index do |value, index|
        indexes << index.to_s
      end
-     move_string = move.to_s
+     move_string = (move - 1).to_s
      indexes.include?(move_string)
   end
   
   def self.is_empty_space?(move, board)
-    board[move.to_i] == Board::EMPTY_SPACE
+    board[(move - 1).to_i] == Board::EMPTY_SPACE
   end
   
 end

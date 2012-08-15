@@ -1,5 +1,9 @@
 class AI
   
+  def initialize(player=nil)
+    @player = player
+  end
+  
   def choose_mark
     marks = ["A", "B"]
     choice = marks.sample
@@ -16,7 +20,7 @@ class AI
     available
   end
   
-  def make_move(board, player)
+  def make_move(board)
      get_available_indexes(board).sample + 1
   end
   

@@ -37,7 +37,6 @@ class Motherclass
   
   def what_player(playertype)
     if playertype == 1
-      puts "human"
       return Human
     end
     if playertype == 2
@@ -53,17 +52,25 @@ class Motherclass
   def gameloop
     player = PLAYER1
     playertype = @player1
+    @ui.populate_board(@uistyle, @board.to_array, @p1mark, @p2mark )
     while end_game?(@board.to_array) == false
-      @ui.populate_board(@uistyle, @board.to_array, @p1mark, @p2mark )
-      move = playertype.new.make_move(@board, player)
+      move = playertype.new(player).make_move(@board.to_array)
+      GC.start
       while(!valid?(move))
         @ui.invalid
-        move = playertype.new.make_move(@board, player)
+        move = playertype.new(player).make_move(@board.to_array)
       end
-      player = PLAYER1 if player == PLAYER2
-      player = PLAYER2 if player == PLAYER1
-      playertype = @player1 if playertype == @player2
-      playertype = @player2 if playertype == @player1
+      @ui.populate_board(@uistyle, board_setter(move, player, @board), @p1mark, @p2mark )
+      if player == PLAYER1
+        player = PLAYER2
+      else
+        player = PLAYER1
+      end
+      if playertype == @player2
+        playertype = @player1 
+      else
+        playertype = @player2
+      end
     end
   end
   
@@ -73,11 +80,12 @@ class Motherclass
     while valid?(move) == false || cheater?(move)
       if valid?(move) == false
         puts "INVALID INPUT! Try Again:"
-        move = @ui.make_move(player)
+        continue = gets
+        move = playertype.new(player).make_move(@board.to_array)
       else 
         puts "You are a cheater! You should be slapped."
         puts "Try Again:"
-        move = @ui.make_move(player)
+        move = playertype.new(player).make_move(@board.to_array)
       end
     end
     move

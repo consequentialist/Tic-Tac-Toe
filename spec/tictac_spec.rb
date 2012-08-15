@@ -155,7 +155,7 @@ describe "AI" do
   end
   
   it "can make a random move" do
-    @ai.make_move([1,0,0,2,0,2,1,0,0],2).should_not == 1 || 4 || 6 || 7
+    @ai.make_move([1,0,0,2,0,2,1,0,0]).should_not == 1 || 4 || 6 || 7
   end
   
   it "can choose a mark" do
@@ -285,6 +285,12 @@ describe "unbeatable ai" do
   it "can make the correct move" do
     board = [1,2,2,0,0,1,1,0,2]
     @ai.make_move(board).should == 3
+    board = [2,0,0,0,0,0,0,0,0]
+    @ai.make_move(board).should == 4 
+    board = [1,0,2,0,0,0,0,0,0]
+    @ai.make_move(board).should == 3
+    board = [1,0,2,1,0,0,2,0,0]
+    @ai.make_move(board).should == 4
   end
   
   #it "can determine a winning index" do

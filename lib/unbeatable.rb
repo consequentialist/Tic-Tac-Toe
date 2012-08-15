@@ -1,22 +1,21 @@
 require_relative "endresult"
 class SuperAI
   
-  def initialize(player)
+  def initialize(player=nil)
      @player = player
   end
   
-  def make_move(board, player=@player)
-    @player = player
+  def make_move(board)
     final_max(board).each_with_index do |minimax, index|
       if minimax != board[index]
-        return index
+        return index + 1
       end
     end
   end
   
   def final_max(board)
     get_children(board, @player).max_by do |child|
-      minimax(child)
+      minimax(child, switch_player(@player))
     end
   end
   
@@ -67,6 +66,13 @@ class SuperAI
         temp[index] = current_player
         children << temp
       end
+    end
+    children.each do |child|
+      (0..8).each do |index|
+        spaces = "  "
+        print child[index].to_s + spaces
+      end
+      puts
     end
     children
   end  
