@@ -1,3 +1,3 @@
 require_relative 'tictactoe'
 
-Motherclass.new.user_interface
+Motherclass.new.game_init

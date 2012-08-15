@@ -1,9 +1,10 @@
 require "rspec"
 require "tictactoe"
-require "winner"
+require "endresult"
 require "board"
 require "ui"
 require "unbeatable"
+require "movevalidator"
 
 describe "board" do
   
@@ -76,17 +77,18 @@ describe "game logic" do
   end
  
   it "can determine a vertical win" do
-    @end.is_vertical_win?([1,2,2,1,2,2,1,1,1]).should == 1
-    @end.is_vertical_win?([2,1,1,2,1,1,2,2,2]).should == 2
+    @end.is_vertical_win?([1,2,2,1,2,2,1,1,1], 1).should == true
+    @end.is_vertical_win?([2,1,1,2,1,1,2,2,2], 2).should == true
+    @end.is_vertical_win?([2,1,1,2,1,1,1,2,2], 2).should == false
   end
   
   it "can determine a horizontal win" do 
-    @end.is_horizontal_win?([2,2,2,1,1,2,1,2,1]).should == 2
+    @end.is_horizontal_win?([2,2,2,1,1,2,1,2,1], 2).should == true
   end
   
   it "can determine a diagonal win" do
-    @end.is_diagonal_win?([1,1,2,2,1,2,2,1,1]).should == 1
-    @end.is_diagonal_win?([2,2,1,1,2,1,1,2,2]).should == 2
+    @end.is_diagonal_win?([1,1,2,2,1,2,2,1,1], 1).should == true
+    @end.is_diagonal_win?([2,2,1,1,2,1,1,2,2], 2).should == true
   end
   
   it "can determine the coutcome of any final board" do
@@ -126,14 +128,19 @@ describe "mother" do
   end
   
   it "can determine illegal moves" do
-    @mother.illegal?("sdf".to_i).should == true
-    @mother.illegal?(15).should == true
-    @mother.illegal?(3).should == false
+    
+    @mother.valid?("sdf").should == false
+    @mother.valid?(15).should == false
+    @mother.valid?(3).should == true
   end
   
   it "can determine cheating moves" do
-    @mother.cheater?([1,0,0,0,0,0,0,2,1], 8).should == true
-    @mother.cheater?([0,2,2,1,2,1,1,2,1], 1).should == false
+    @mother.valid?(8).should == true
+    @mother.valid?(1).should == true
+  end
+  
+  it "can determine the player type" do
+    @mother.what_player(1).should == Human
   end
 end
 
@@ -175,32 +182,109 @@ describe "motherclass" do
   
   before(:each) do
     @mother = Motherclass.new
+    @test_ui = mock(UserInterface, :new => true, :gamestart_message => true, :choose_mark => "x" , :invalid => true, :choose_ui => true, :choose_player_type => true, :splash => true)
+    @mother.stub(:gameloop)
+    UserInterface.stub(:new).and_return(@test_ui)
   end
   
   it "should call the gamestart message" do
-    UserInterface.should_receive(:gamestart_message) { "Hit Enter to Start\n" }
-    UserInterface.should_receive(:choose_mark) { "Choose Your Mark:\n" }
-    UserInterface.should_receive(:invalid) { "Invalid input. Try again\n" }
-    UserInterface.should_receive(:choose_ui) {"Choose User Interface Type:\n" +
-                                              "(1) SD User Interface\n" +
-                                              "(2) HD User Interface" }
-    UserInterface.should_receive(:choose_player_type) { "Choose Player Type:\n" +
-                                                   "(1) Human\n" +
-                                                   "(2) Computer"}
-    UserInterface.should_receive(:splash) { "  _____ _        _____            _____           \n" +
-                                            " |_   _(_) ___  |_   _|_ _  ___  |_   _|__   ___  \n" +
-                                            "   | | | |/ __|   | |/ _` |/ __|   | |/ _ | / _ | \n" +
-                                            "   | | | | (__    | | (_| | (__    | | (_) |  __/ \n" +
-                                            "   |_| |_||___|   |_||__,_||___|   |_||___/ |___| \n"}
+    @test_ui.should_receive(:gamestart_message)
+    @test_ui.should_receive(:choose_mark)
+    #@test_ui.should_receive(:invalid)
+    @test_ui.stub(:choose_mark).and_return("o")
+    @test_ui.should_receive(:choose_ui)
+    @test_ui.should_receive(:choose_player_type).exactly(2)
+    @test_ui.should_receive(:splash)
     @mother.game_init
   end
+  
+end
 
+describe "move validator" do
+   let(:board) { Array.new(9, Board::EMPTY_SPACE) }
+  
+  it "knows when a negative move is out of bounds" do
+    move = -1
+    MoveValidator.validate(move, board).should be_false
+  end
+  
+  it "knows when a positive number is out of bounds" do
+    move = 29
+    MoveValidator.validate(move, board).should == false
+  end
+  
+  it "knows when a positive number is in bounds" do
+    move = 2
+    MoveValidator.validate(move, board).should == true
+  end
+  
+  it "knows when a space is taken" do
+    move = 2
+    board[move] = "not empty"
+    MoveValidator.validate(move, board).should == false
+  end
+  
+  it "handles string input" do
+    move = "2"
+    MoveValidator.validate(move, board).should == true
+  end
+  
+  it "throws out non-integer strings" do
+    move = "garbage"
+    MoveValidator.validate(move, board).should be_false
+  end
 end
 
 describe "unbeatable ai" do
   
   before(:each) do
-    @ai = SuperAI.new
+    @ai = SuperAI.new(1)
+  end
+    
+  it "can devide the board into children" do
+    board = [1,2,0,1,0,1,0,2,2]
+    @ai.get_children(board, 1).should == [[1,2,1,1,0,1,0,2,2],[1,2,0,1,1,1,0,2,2],[1,2,0,1,0,1,1,2,2]]
+  end 
+  
+  it "can rate an endgame win" do
+    board = [1,2,2,1,1,2,2,1,1]
+    @ai.rate_result(board).should == 1
+  end
+  
+  it "can rate an endgame loss" do
+    board = [1,1,2,2,2,2,1,2,1]
+    @ai.rate_result(board).should == -1
+  end
+  
+  it "can rate an endgame tie" do
+    board = [1,2,2,2,1,1,1,2,2]
+    @ai.rate_result(board).should == 0
+  end
+  
+  it "can retun nil if a game is over" do
+    board = [1,2,2,2,0,1,1,2,2]
+    @ai.rate_result(board).should == nil
+  end
+  
+  it "can retun 0 if a game is over" do
+    board = [1, 2, 2, 2, 1, 1, 1, 1, 2]
+    @ai.rate_result(board).should == 0
+  end
+  
+  it "can return the highest rating" do
+    p "THIS IS MINIMAX"
+    board = [1,2,2,0,0,1,1,0,2]
+    @ai.minimax(board).should == 1
+  end
+  
+  it "can get the correct scenario" do
+    board = [1,2,2,0,0,1,1,0,2]
+    @ai.final_max(board).should == [1,2,2,1,0,1,1,0,2]
+  end
+  
+  it "can make the correct move" do
+    board = [1,2,2,0,0,1,1,0,2]
+    @ai.make_move(board).should == 3
   end
   
   #it "can determine a winning index" do

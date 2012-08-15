@@ -1,7 +1,11 @@
 require_relative 'board'
-require_relative 'winner'
+require_relative 'endresult'
 require_relative 'ui'
 require_relative 'ai'
+require_relative "human"
+require_relative "unbeatable"
+require_relative "movevalidator"
+
 
 
 class Motherclass
@@ -9,58 +13,68 @@ class Motherclass
   PLAYER1 = 1
   PLAYER2 = 2
   
-  def start
+  def initialize
     @board = Board.new
     @ui = UserInterface.new
     @ai = AI.new
   end
   
   def game_init
-    ui = UserInterface
+    ui = UserInterface.new
     ui.gamestart_message
     ui.splash
-    uistyle = ui.choose_ui
-    player1 = ui.choose_player_type
-    player2 = ui.choose_player_type
-    p1mark = ui.choose_mark
-    p2mark = ui.choose_mark
-    while player1 == player2
+    @uistyle = ui.choose_ui
+    @player1 = what_player(ui.choose_player_type(PLAYER1))
+    @player2 = what_player(ui.choose_player_type(PLAYER2))
+    @p1mark = ui.choose_mark
+    @p2mark = ui.choose_mark
+    while @p1mark == @p2mark
       ui.invalid
-      player2 = ui.choose_mark
+      p2mark = ui.choose_mark
     end
-    board = Board.new
-    #gameloop(board)
-   
+    gameloop
   end
   
-  def gameloop(board)
-    move = @ui.make_move(PLAYER1)
-    while illegal?(move)
-      puts "INVALID INPUT! Try Again:"
-      move = @ui.make_move(PLAYER1)
+  def what_player(playertype)
+    if playertype == 1
+      puts "human"
+      return Human
     end
-    while end_game?(board_setter(move, PLAYER1, board)) == false
-      puts @ui.populate_board(board_setter(move, PLAYER1, board))
-      move = calculate_illegal(@ui.make_move(PLAYER2), board, PLAYER2, ui)
-      if end_game?(board_setter(move, PLAYER2, board)) == false
-      puts @ui.populate_board(board_setter(move, PLAYER2, board))
-      move = calculate_illegal(@ui.make_move(PLAYER1), board, PLAYER1, ui)
+    if playertype == 2
+      playertype = UserInterface.new.choose_computer 
+      if playertype == 1
+        return AI
+      else
+        return SuperAI
       end
     end
-    if end_game?(board_setter(move, PLAYER1, board)) == true
-      puts @ui.populate_board(@boardarray)
-      puts @ui.announce_end(board_setter(move, PLAYER2, board))
+  end
+  
+  def gameloop
+    player = PLAYER1
+    playertype = @player1
+    while end_game?(@board.to_array) == false
+      @ui.populate_board(@uistyle, @board.to_array, @p1mark, @p2mark )
+      move = playertype.new.make_move(@board, player)
+      while(!valid?(move))
+        @ui.invalid
+        move = playertype.new.make_move(@board, player)
+      end
+      player = PLAYER1 if player == PLAYER2
+      player = PLAYER2 if player == PLAYER1
+      playertype = @player1 if playertype == @player2
+      playertype = @player2 if playertype == @player1
     end
   end
   
   def calculate_illegal(playermove, board, player)
     move = 0
     move = playermove
-    while illegal?(move) || cheater?(move)
-      if illegal?(move)
+    while valid?(move) == false || cheater?(move)
+      if valid?(move) == false
         puts "INVALID INPUT! Try Again:"
         move = @ui.make_move(player)
-      else
+      else 
         puts "You are a cheater! You should be slapped."
         puts "Try Again:"
         move = @ui.make_move(player)
@@ -69,13 +83,10 @@ class Motherclass
     move
   end
  
-  def illegal?(spot)
-    spot > 9 || spot < 1
+  def valid?(spot)
+    MoveValidator.validate(spot, @board.to_array)
   end
-  
-  def cheater?(board, spot)
-    board[spot - 1] > 0
-  end
+
   
   def board_setter(spot, player, board)
     @boardarray = []
@@ -84,7 +95,7 @@ class Motherclass
   end
   
   def end_game?(input)
-    EndResult.new.determine_win(input) != 0
+    EndResult.new.determine_win(input) != nil
   end
 
 end

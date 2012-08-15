@@ -1,5 +1,7 @@
 class Board
 
+  EMPTY_SPACE = 0
+  
   def to_array
     @board
   end
@@ -7,7 +9,7 @@ class Board
   def initialize
     @board = []
     9.times do
-    @board << 0
+      @board << EMPTY_SPACE 
     end
     @board
   end

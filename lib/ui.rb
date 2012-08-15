@@ -25,12 +25,17 @@ class UserInterface
   
 
 
-  def populate_board(uistyle, board, playermark)
+  def populate_board(uistyle, board, player1mark, player2mark )
     letters = []
     board.each do |mark|
-      if mark = PLAYER1
-        letters << player
+      if mark == PLAYER1
+        letters << player1mark
+      elsif mark == PLAYER2
+        letters << player2mark
+      else 
+        letters << " "
       end
+      put "uiui"
     end
     if uistyle == REGULAR
       return "   |   |   \n"+"_"+letters[0]+"_|_"+letters[1]+"_|_"+letters[2]+"_\n"+"   |   |   \n"+"_"+letters[3]+"_|_"+letters[4]+"_|_"+letters[5]+"_\n"+"   |   |   \n"+"_"+letters[6]+"_|_"+letters[7]+"_|_"+letters[8]+"_"
@@ -42,7 +47,6 @@ class UserInterface
   
   def splash
      puts "  _____ _        _____            _____           " 
-     sleep($delay)
      puts " |_   _(_) ___  |_   _|_ _  ___  |_   _|__   ___  " 
      sleep($delay)
      puts "   | | | |/ __|   | |/ _` |/ __|   | |/ _ | / _ | "
